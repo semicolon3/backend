@@ -2,10 +2,10 @@ spring:
   application:
     name: legal-ai
   datasource:
-    url: jdbc:postgresql://localhost:5432/legal_ai
-    username: postgres
-    password: min16489307!
-    driver-class-name: org.postgresql.Driver
+    url: jdbc:mysql://mysql-1cf218b2-my-first-db.h.aivencloud.com:11444/defaultDB?useSSL=true&allowPublicKeyRetrieval=true
+    username: avnadmin
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
       ddl-auto: update
@@ -13,11 +13,23 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
 
 server:
   port: 8080
 
 jwt:
   secret: legalai-super-secret-key-for-jwt-signing-must-be-at-least-256-bits
-  access-token-expiration: 3600000       # 1시간
-  refresh-token-expiration: 604800000    # 7일
+  access-token-expiration: 3600000
+  refresh-token-expiration: 604800000
+
+file:
+  upload-dir: ./uploads
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

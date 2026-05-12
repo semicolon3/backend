@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(./gradlew compileJava)"
+      "Bash(./gradlew compileJava)",
+      "Bash(./gradlew bootRun)",
+      "Bash(netstat -ano)",
+      "Bash(findstr :8080)",
+      "Bash(taskkill /PID 63312 /F)",
+      "PowerShell(Stop-Process -Id 63312 -Force)"
     ]
   }
 }
