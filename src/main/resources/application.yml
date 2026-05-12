@@ -4,7 +4,7 @@ spring:
   datasource:
     url: jdbc:mysql://mysql-1cf218b2-my-first-db.h.aivencloud.com:11444/defaultDB?useSSL=true&allowPublicKeyRetrieval=true
     username: avnadmin
-    password:
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -23,7 +23,7 @@ server:
   port: 8080
 
 jwt:
-  secret: legalai-super-secret-key-for-jwt-signing-must-be-at-least-256-bits
+  secret: ${JWT_SECRET}
   access-token-expiration: 3600000
   refresh-token-expiration: 604800000
 
@@ -33,3 +33,8 @@ file:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+
+law:
+  api:
+    key: ${LAW_API_KEY}
+    base-url: https://open.law.go.kr/LSO/openApi
