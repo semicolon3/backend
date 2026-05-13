@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: optional:file:.env[.properties]
   application:
     name: legal-ai
   datasource:
@@ -37,4 +39,10 @@ springdoc:
 law:
   api:
     key: ${LAW_API_KEY}
-    base-url: https://open.law.go.kr/LSO/openApi
+    base-url: https://www.law.go.kr/DRF
+
+openai:
+  api:
+    key: ${OPENAI_API_KEY}
+    url: https://api.openai.com/v1/chat/completions
+  model: gpt-4o-mini
