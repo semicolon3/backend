@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: legal-ai
+  datasource:
+    url: jdbc:mysql://mysql-1cf218b2-my-first-db.h.aivencloud.com:11444/defaultDB?useSSL=true&allowPublicKeyRetrieval=true
+    username: avnadmin
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+server:
+  port: 8080
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-expiration: 3600000
+  refresh-token-expiration: 604800000
+
+file:
+  upload-dir: ./uploads
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+law:
+  api:
+    key: ${LAW_API_KEY}
+    base-url: https://open.law.go.kr/LSO/openApi
