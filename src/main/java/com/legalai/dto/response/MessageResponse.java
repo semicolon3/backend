@@ -6,6 +6,7 @@ import com.legalai.domain.Message;
 import com.legalai.domain.MessageRole;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.extern.jackson.Jacksonized;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -23,6 +24,7 @@ public class MessageResponse {
 
     @Getter
     @Builder
+    @Jacksonized
     public static class Citation {
         private String lawId;       // 법령 ID (상세조회용)
         private String lawName;     // 법령명 한글

@@ -156,23 +156,44 @@ public class OpenAiService {
                 }
             }
 
-            // 후처리 안전망: citations가 비었지만 retrieve된 법령이 있으면 자동 보강
-            // (1) 답변 본문에 언급된 법령은 자동으로 citations에 추가
+            // 후처리 안전망: citations가 비었으면 자동 보강
+            // (1) retrieve된 법령 중 answer 본문에 언급된 법령 추출
             // (2) 그래도 비면 첫 번째 검색 결과를 best-effort로 추가
-            if (citations.isEmpty() && laws != null && !laws.isEmpty()) {
-                for (RetrievedLaw law : laws) {
-                    if (law.lawName() != null && !law.lawName().isBlank()
-                            && answer.contains(law.lawName())) {
-                        citations.add(new LawCitation(law.lawId(), law.lawName(), ""));
-                        if (citations.size() >= 3) break;
+            // (3) laws도 없으면 answer에서 알려진 법령명 패턴 매칭
+            if (citations.isEmpty()) {
+                if (laws != null && !laws.isEmpty()) {
+                    for (RetrievedLaw law : laws) {
+                        if (law.lawName() != null && !law.lawName().isBlank()
+                                && answer.contains(law.lawName())) {
+                            citations.add(new LawCitation(law.lawId(), law.lawName(), ""));
+                            if (citations.size() >= 3) break;
+                        }
                     }
-                }
-                if (citations.isEmpty()) {
-                    RetrievedLaw first = laws.get(0);
-                    citations.add(new LawCitation(first.lawId(), first.lawName(), ""));
-                    log.info("citations 자동 보강 (best-effort) — lawId={}", first.lawId());
+                    if (citations.isEmpty()) {
+                        RetrievedLaw first = laws.get(0);
+                        citations.add(new LawCitation(first.lawId(), first.lawName(), ""));
+                        log.info("citations 자동 보강 (best-effort) — lawId={}", first.lawId());
+                    } else {
+                        log.info("citations 자동 보강 (본문 언급 추출) — {}건", citations.size());
+                    }
                 } else {
-                    log.info("citations 자동 보강 (본문 언급 추출) — {}건", citations.size());
+                    // laws도 없는 경우: answer 본문에서 알려진 법령명 패턴 매칭
+                    String[][] knownLaws = {
+                            {"011073", "주택임대차보호법"}, {"017008", "상가건물 임대차보호법"},
+                            {"001602", "근로기준법"}, {"001634", "최저임금법"},
+                            {"001397", "소비자기본법"}, {"001362", "도로교통법"},
+                            {"001149", "민법"}, {"001276", "형법"},
+                            {"001246", "교통사고처리 특례법"}, {"001363", "약관의 규제에 관한 법률"}
+                    };
+                    for (String[] law : knownLaws) {
+                        if (answer.contains(law[1])) {
+                            citations.add(new LawCitation(law[0], law[1], ""));
+                            if (citations.size() >= 3) break;
+                        }
+                    }
+                    if (!citations.isEmpty()) {
+                        log.info("citations 자동 보강 (알려진 법령명 패턴) — {}건", citations.size());
+                    }
                 }
             }
 
