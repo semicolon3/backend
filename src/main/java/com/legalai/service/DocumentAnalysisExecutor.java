@@ -45,10 +45,11 @@ public class DocumentAnalysisExecutor {
             documentRepository.save(document);
 
             // 1. 파일에서 텍스트 추출
-            String text = extractText(document);
-            if (text == null || text.isBlank()) {
+            String rawText = extractText(document);
+            String textForAi = rawText;
+            if (textForAi == null || textForAi.isBlank()) {
                 // OCR 미도입 단계 — 이미지/카톡 캡쳐는 파일 메타데이터만 전달
-                text = String.format(
+                textForAi = String.format(
                         "(텍스트를 추출할 수 없는 파일입니다. 파일명: %s, 유형: %s. " +
                                 "이 정보만으로 일반적인 주의사항을 안내해 주세요.)",
                         document.getOriginalFileName(),
@@ -57,7 +58,7 @@ public class DocumentAnalysisExecutor {
             }
 
             // 2. OpenAI 호출
-            String analysisJson = openAiService.analyzeDocument(text, document.getDocumentType());
+            String analysisJson = openAiService.analyzeDocument(textForAi, document.getDocumentType());
             log.debug("OpenAI 응답 (documentId={}): {}", documentId, analysisJson);
 
             // 3. 응답 파싱 → 필드별로 분리해 DB 저장
@@ -71,6 +72,7 @@ public class DocumentAnalysisExecutor {
                     .summary(summary)
                     .entitiesJson(entitiesJson)
                     .riskClausesJson(riskClausesJson)
+                    .extractedText(rawText)   // 원문 텍스트 저장 (뷰어 렌더링용)
                     .build();
             documentAnalysisRepository.save(analysis);
 
