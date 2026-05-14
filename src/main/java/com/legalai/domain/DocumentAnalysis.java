@@ -30,15 +30,20 @@ public class DocumentAnalysis {
     @Column(columnDefinition = "TEXT")
     private String riskClausesJson;
 
+    /** PDF/OCR로 추출한 원문 텍스트 (문서 뷰어 렌더링용) */
+    @Column(columnDefinition = "TEXT")
+    private String extractedText;
+
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @Builder
-    private DocumentAnalysis(Long documentId, String summary, String entitiesJson, String riskClausesJson) {
+    private DocumentAnalysis(Long documentId, String summary, String entitiesJson, String riskClausesJson, String extractedText) {
         this.documentId = documentId;
         this.summary = summary;
         this.entitiesJson = entitiesJson;
         this.riskClausesJson = riskClausesJson;
+        this.extractedText = extractedText;
     }
 }

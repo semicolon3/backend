@@ -103,6 +103,7 @@ public class DocumentService {
                     .summary(analysis.getSummary())
                     .entities(entities)
                     .riskClauses(riskClauses)
+                    .extractedText(analysis.getExtractedText())
                     .build();
         } catch (Exception e) {
             log.error("분석 결과 파싱 실패 - documentId: {}", documentId, e);

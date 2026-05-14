@@ -81,7 +81,8 @@ public class OpenAiService {
                   },
                   "riskClauses": [
                     {
-                      "clauseTitle": "주의가 필요한 조항/내용 제목",
+                      "clauseTitle": "주의가 필요한 조항/내용 제목 (예: 제5조 보증금 반환)",
+                      "originalText": "문서에서 해당 조항의 실제 원문 텍스트를 그대로 복사하세요. 없으면 빈 문자열.",
                       "description": "왜 주의해야 하는지 일반론적 설명 + 관련 법령 인용",
                       "severity": "LOW | MEDIUM | HIGH"
                     }
@@ -90,6 +91,7 @@ public class OpenAiService {
 
                 추출할 정보가 없으면 배열은 [], 객체는 {}로 비워두세요.
                 severity는 반드시 LOW, MEDIUM, HIGH 중 하나여야 합니다.
+                originalText는 문서 원문에서 해당 조항 텍스트를 그대로 가져오세요 (요약 금지).
                 """;
     }
 
