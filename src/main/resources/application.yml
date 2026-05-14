@@ -30,7 +30,7 @@ jwt:
   refresh-token-expiration: 604800000
 
 file:
-  upload-dir: C:\Users\wodnd\Downloads\legal-ai\legal-ai\uploads
+  upload-dir: ${FILE_UPLOAD_DIR:/app/uploads}
 
 springdoc:
   swagger-ui:
