@@ -11,10 +11,17 @@ import com.legalai.repository.DocumentAnalysisRepository;
 import com.legalai.repository.DocumentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -111,6 +118,32 @@ public class DocumentService {
         Document document = findDocument(documentId, userId);
         fileStorageService.delete(document.getStoredFileName());
         document.softDelete();
+    }
+
+    public record ThumbnailResult(byte[] data, String contentType) {}
+
+    @Transactional(readOnly = true)
+    public ThumbnailResult getThumbnail(Long documentId) {
+        Document document = documentRepository.findByIdAndDeletedAtIsNull(documentId)
+                .orElseThrow(() -> new CustomException(ErrorCode.DOCUMENT_NOT_FOUND));
+        String mimeType = document.getMimeType() != null ? document.getMimeType() : "";
+        byte[] fileBytes = fileStorageService.load(document.getStoredFileName());
+
+        if (mimeType.contains("pdf")) {
+            try (PDDocument pdf = Loader.loadPDF(fileBytes)) {
+                PDFRenderer renderer = new PDFRenderer(pdf);
+                BufferedImage image = renderer.renderImageWithDPI(0, 150);
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                ImageIO.write(image, "PNG", out);
+                return new ThumbnailResult(out.toByteArray(), "image/png");
+            } catch (IOException e) {
+                throw new CustomException(ErrorCode.FILE_NOT_FOUND);
+            }
+        } else if (mimeType.startsWith("image/")) {
+            return new ThumbnailResult(fileBytes, mimeType);
+        } else {
+            throw new CustomException(ErrorCode.FILE_NOT_FOUND);
+        }
     }
 
     private Document findDocument(Long documentId, Long userId) {

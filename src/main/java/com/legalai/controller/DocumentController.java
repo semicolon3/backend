@@ -10,7 +10,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -58,6 +60,15 @@ public class DocumentController {
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.ok(documentService.getAnalysis(id, principal.getUserId())));
+    }
+
+    @Operation(summary = "문서 썸네일 조회", description = "PDF는 첫 페이지를 PNG로 변환, 이미지는 그대로 반환 (인증 불필요)")
+    @GetMapping("/{id}/thumbnail")
+    public ResponseEntity<byte[]> getThumbnail(@PathVariable Long id) {
+        DocumentService.ThumbnailResult result = documentService.getThumbnail(id);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType(result.contentType()));
+        return ResponseEntity.ok().headers(headers).body(result.data());
     }
 
     @Operation(summary = "문서 삭제")
